@@ -1,0 +1,17 @@
+node_modules/
+dist/
+coverage/
+
+.env
+.env.*
+!.env.example
+
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+
+cypress/screenshots/
+cypress/videos/
+
+*.log
