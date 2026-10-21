@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run test:unit",
+    "test:unit": "vitest run tests/unit",
     "start": "node src/server.js",
     "dev": "node --watch src/server.js"
   },
@@ -15,5 +16,8 @@
     "better-sqlite3": "13.0.3",
     "express": "^5.3.0"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "vitest": "5.0.5"
+  }
 }

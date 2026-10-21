@@ -51,9 +51,20 @@ node --input-type=module -e "import Database from 'better-sqlite3'; const db = n
 Hermes; no es una configuración global ni una instrucción general para instalar
 el frontend.
 
-## Pruebas previstas
+## Pruebas
 
-- Unitarias: Vitest.
+La suite unitaria comprueba directamente los contratos de validación de tareas,
+incluidos valores válidos, errores de tipo y límites, sin iniciar HTTP ni SQLite:
+
+```bash
+cd backend
+npm run test:unit
+```
+
+`npm test` ejecuta la misma suite una sola vez mediante `vitest run`.
+
+### Pruebas previstas
+
 - Integración: Vitest y Supertest.
 - E2E: Cypress.
 - Carga: k6.
