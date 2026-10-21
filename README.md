@@ -53,19 +53,23 @@ el frontend.
 
 ## Pruebas
 
-La suite unitaria comprueba directamente los contratos de validación de tareas,
-incluidos valores válidos, errores de tipo y límites, sin iniciar HTTP ni SQLite:
+La suite unitaria comprueba directamente los contratos de validación. La suite
+de integración ejercita las rutas, el repositorio y SQLite reales con una base
+en memoria nueva por prueba; el caso de persistencia usa y limpia su propio
+directorio temporal.
 
 ```bash
 cd backend
 npm run test:unit
+npm run test:integration
+npm test
 ```
 
-`npm test` ejecuta la misma suite una sola vez mediante `vitest run`.
+Cada comando usa `vitest run`, sin modo watch. `npm test` ejecuta primero las
+pruebas unitarias y después las de integración.
 
 ### Pruebas previstas
 
-- Integración: Vitest y Supertest.
 - E2E: Cypress.
 - Carga: k6.
 - Automatización: GitHub Actions.
