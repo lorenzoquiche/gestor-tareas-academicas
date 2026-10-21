@@ -13,6 +13,44 @@ Proyecto final del curso Aseguramiento de la Calidad de Software.
 
 React, Vite, Node.js, Express y SQLite.
 
+## Backend
+
+Desde `backend/`, instala y arranca la API:
+
+```bash
+npm ci
+npm start
+```
+
+La API queda disponible en `http://localhost:3000` y usa SQLite. Se puede indicar
+otra base con la variable de entorno `DATABASE_PATH`.
+
+Endpoints:
+
+- `GET /api/health`: comprueba el estado del servicio.
+- `POST /api/tareas`: crea una tarea.
+- `GET /api/tareas`: lista tareas; acepta `?estado=pendiente` o
+  `?estado=completada`.
+- `PUT /api/tareas/:id`: reemplaza los datos editables de una tarea.
+- `PATCH /api/tareas/:id/estado`: cambia únicamente su estado.
+- `DELETE /api/tareas/:id`: elimina la tarea.
+
+### Instalación en Hermes
+
+Para `better-sqlite3@13.0.3`, la solución comprobada en Hermes es omitir los
+scripts durante esta instalación del backend y verificar el acceso a SQLite con
+una base en memoria:
+
+```bash
+cd backend
+npm ci --ignore-scripts
+node --input-type=module -e "import Database from 'better-sqlite3'; const db = new Database(':memory:'); console.log(db.prepare('SELECT 1 AS ok').get()); db.close();"
+```
+
+`--ignore-scripts` se aplica solamente a esta instalación del backend en
+Hermes; no es una configuración global ni una instrucción general para instalar
+el frontend.
+
 ## Pruebas previstas
 
 - Unitarias: Vitest.

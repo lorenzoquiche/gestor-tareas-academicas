@@ -1,4 +1,5 @@
 const PRIORIDADES = new Set(['baja', 'media', 'alta']);
+const ESTADOS = new Set(['pendiente', 'completada']);
 
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -65,4 +66,41 @@ export function validateNewTarea(body) {
       fechaEntrega: body.fechaEntrega,
     },
   };
+}
+
+export function validateTareaId(value) {
+  if (typeof value !== 'string' || !/^\d+$/.test(value)) {
+    return { error: 'El id debe contener únicamente dígitos.' };
+  }
+
+  const id = Number(value);
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    return { error: 'El id debe representar un entero positivo seguro.' };
+  }
+
+  return { value: id };
+}
+
+export function validateEstado(body) {
+  if (!isPlainObject(body)) {
+    return { error: 'El cuerpo de la solicitud debe ser un objeto JSON.' };
+  }
+
+  if (typeof body.estado !== 'string' || !ESTADOS.has(body.estado)) {
+    return { error: 'El estado debe ser pendiente o completada.' };
+  }
+
+  return { value: body.estado };
+}
+
+export function validateEstadoFilter(query) {
+  if (!Object.prototype.hasOwnProperty.call(query, 'estado')) {
+    return { value: undefined };
+  }
+
+  if (typeof query.estado !== 'string' || !ESTADOS.has(query.estado)) {
+    return { error: 'El filtro estado debe ser pendiente o completada y aparecer una sola vez.' };
+  }
+
+  return { value: query.estado };
 }
