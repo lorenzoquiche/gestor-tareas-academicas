@@ -13,6 +13,32 @@ Proyecto final del curso Aseguramiento de la Calidad de Software.
 
 React, Vite, Node.js, Express y SQLite.
 
+El frontend usa React `19.3.1`, React DOM `19.3.1`, Vite `8.3.5` y
+`@vitejs/plugin-react` `6.1.2`. Estas versiones son compatibles con Node
+`22.15.1` y Node 24.
+
+## Desarrollo local
+
+Desde la raíz del proyecto, inicia el backend en una primera terminal:
+
+```bash
+cd backend
+npm ci
+npm start
+```
+
+En una segunda terminal, inicia el frontend:
+
+```bash
+cd frontend
+npm ci
+npm run dev
+```
+
+La interfaz queda en `http://localhost:5173`. Vite mantiene ese puerto de forma
+estricta y redirige las solicitudes relativas `/api` al backend en
+`http://localhost:3000`.
+
 ## Backend
 
 Desde `backend/`, instala y arranca la API:
