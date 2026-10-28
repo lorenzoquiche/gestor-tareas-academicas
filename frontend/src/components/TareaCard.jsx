@@ -15,17 +15,26 @@ export function TareaCard({ tarea, isBusy, onDelete, onEdit, onToggle }) {
     >
       <div className="task-card-header">
         <div className="task-title-group">
-          <span className={`priority priority-${tarea.prioridad}`}>
+          <span
+            className={`priority priority-${tarea.prioridad}`}
+            data-cy="task-card-priority"
+          >
             Prioridad {tarea.prioridad}
           </span>
-          <h3>{tarea.titulo}</h3>
+          <h3 data-cy="task-card-title">{tarea.titulo}</h3>
         </div>
-        <span className={`status status-${tarea.estado}`}>
+        <span
+          className={`status status-${tarea.estado}`}
+          data-cy="task-card-status"
+        >
           {isCompleted ? 'Completada' : 'Pendiente'}
         </span>
       </div>
 
-      <p className={`task-description ${tarea.descripcion ? '' : 'muted'}`}>
+      <p
+        className={`task-description ${tarea.descripcion ? '' : 'muted'}`}
+        data-cy="task-card-description"
+      >
         {tarea.descripcion || 'Sin descripción.'}
       </p>
 
@@ -33,7 +42,9 @@ export function TareaCard({ tarea, isBusy, onDelete, onEdit, onToggle }) {
         <div>
           <dt>Entrega</dt>
           <dd>
-            <time dateTime={tarea.fechaEntrega}>{tarea.fechaEntrega}</time>
+            <time dateTime={tarea.fechaEntrega} data-cy="task-card-date">
+              {tarea.fechaEntrega}
+            </time>
           </dd>
         </div>
       </dl>

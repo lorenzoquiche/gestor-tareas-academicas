@@ -94,8 +94,25 @@ npm test
 Cada comando usa `vitest run`, sin modo watch. `npm test` ejecuta primero las
 pruebas unitarias y después las de integración.
 
+Las pruebas E2E arrancan automáticamente el backend real en el puerto `3310` y
+Vite en el `5174`. Cada ejecución crea una base SQLite en un directorio temporal
+independiente, espera ambos servicios y cierra sus procesos antes de eliminar
+ese directorio. Nunca utiliza `backend/data/tareas.db` y falla si cualquiera de
+los puertos E2E ya está ocupado.
+
+Desde `frontend/`, ejecuta la suite sin interfaz:
+
+```bash
+npm run test:e2e
+```
+
+Para abrir Cypress de forma interactiva con el mismo aislamiento:
+
+```bash
+npm run test:e2e:open
+```
+
 ### Pruebas previstas
 
-- E2E: Cypress.
 - Carga: k6.
 - Automatización: GitHub Actions.
