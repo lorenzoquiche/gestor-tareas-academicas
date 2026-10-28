@@ -112,7 +112,48 @@ Para abrir Cypress de forma interactiva con el mismo aislamiento:
 npm run test:e2e:open
 ```
 
+### Pruebas de carga
+
+Instala [k6](https://grafana.com/docs/k6/latest/set-up/install-k6/) y confirma
+que el ejecutable esté en `PATH`:
+
+```bash
+# Windows
+winget install k6 --source winget
+
+# macOS
+brew install k6
+
+# Verificación en cualquier sistema
+k6 version
+```
+
+Desde `backend/`, ejecuta:
+
+```bash
+npm run test:load
+```
+
+El orquestador inicia un backend real en el puerto exclusivo `3320`, con una
+base SQLite dentro de un directorio temporal independiente. Espera el endpoint
+health, ejecuta k6 y, al terminar o fallar, cierra sus procesos y elimina ese
+directorio. Nunca utiliza `backend/data/tareas.db` y rechaza la ejecución si el
+puerto ya está ocupado.
+
+La carga sube de 0 a 10 usuarios virtuales en 10 segundos, mantiene 10 durante
+30 segundos y baja a 0 en 10 segundos. Cada usuario virtual repite de forma
+independiente el flujo crear, listar pendientes, completar y eliminar, con una
+pausa de un segundo por iteración.
+
+- **Usuarios virtuales (VU):** ejecuciones concurrentes del flujo.
+- **p95:** tiempo bajo el cual termina el 95 % de las solicitudes.
+- **Tasa de errores:** proporción de solicitudes HTTP consideradas fallidas.
+- **Checks:** proporción de comprobaciones funcionales aprobadas.
+
+Los objetivos iniciales son menos de 1 % de errores HTTP, p95 inferior a 500 ms
+y 100 % de checks aprobados. Son umbrales académicos iniciales y no constituyen
+una garantía de capacidad en producción.
+
 ### Pruebas previstas
 
-- Carga: k6.
 - Automatización: GitHub Actions.
