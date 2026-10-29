@@ -1,0 +1,186 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unitarias:
+    name: unitarias
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v7.0.1
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: "22.15.1"
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Instalar backend
+        working-directory: backend
+        run: npm ci --ignore-scripts
+
+      - name: Verificar better-sqlite3
+        working-directory: backend
+        run: |
+          node --input-type=module -e "
+            import Database from 'better-sqlite3';
+            const database = new Database(':memory:');
+            try {
+              const row = database.prepare('SELECT 1 AS ok').get();
+              if (row.ok !== 1) throw new Error('SELECT 1 no devolvió el resultado esperado.');
+              console.log('better-sqlite3 operativo con SQLite en memoria.');
+            } finally {
+              database.close();
+            }
+          "
+
+      - name: Ejecutar pruebas unitarias
+        working-directory: backend
+        run: npm run test:unit
+
+  integracion:
+    name: integracion
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v7.0.1
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: "22.15.1"
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Instalar backend
+        working-directory: backend
+        run: npm ci --ignore-scripts
+
+      - name: Verificar better-sqlite3
+        working-directory: backend
+        run: |
+          node --input-type=module -e "
+            import Database from 'better-sqlite3';
+            const database = new Database(':memory:');
+            try {
+              const row = database.prepare('SELECT 1 AS ok').get();
+              if (row.ok !== 1) throw new Error('SELECT 1 no devolvió el resultado esperado.');
+              console.log('better-sqlite3 operativo con SQLite en memoria.');
+            } finally {
+              database.close();
+            }
+          "
+
+      - name: Ejecutar pruebas de integración
+        working-directory: backend
+        run: npm run test:integration
+
+  e2e:
+    name: e2e
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v7.0.1
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: "22.15.1"
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+
+      - name: Instalar backend
+        working-directory: backend
+        run: npm ci --ignore-scripts --omit=dev
+
+      - name: Verificar better-sqlite3
+        working-directory: backend
+        run: |
+          node --input-type=module -e "
+            import Database from 'better-sqlite3';
+            const database = new Database(':memory:');
+            try {
+              const row = database.prepare('SELECT 1 AS ok').get();
+              if (row.ok !== 1) throw new Error('SELECT 1 no devolvió el resultado esperado.');
+              console.log('better-sqlite3 operativo con SQLite en memoria.');
+            } finally {
+              database.close();
+            }
+          "
+
+      - name: Instalar frontend y Cypress
+        working-directory: frontend
+        run: npm ci
+
+      - name: Compilar frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Ejecutar pruebas E2E
+        working-directory: frontend
+        run: npm run test:e2e
+
+      - name: Guardar capturas de Cypress al fallar
+        if: failure()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: capturas-cypress
+          path: frontend/cypress/screenshots
+          if-no-files-found: ignore
+          retention-days: 3
+
+  carga:
+    name: carga
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v7.0.1
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: "22.15.1"
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Instalar backend
+        working-directory: backend
+        run: npm ci --ignore-scripts --omit=dev
+
+      - name: Verificar better-sqlite3
+        working-directory: backend
+        run: |
+          node --input-type=module -e "
+            import Database from 'better-sqlite3';
+            const database = new Database(':memory:');
+            try {
+              const row = database.prepare('SELECT 1 AS ok').get();
+              if (row.ok !== 1) throw new Error('SELECT 1 no devolvió el resultado esperado.');
+              console.log('better-sqlite3 operativo con SQLite en memoria.');
+            } finally {
+              database.close();
+            }
+          "
+
+      - name: Instalar k6
+        uses: grafana/setup-k6-action@v1.2.2
+        with:
+          k6-version: "2.2.0"
+
+      - name: Ejecutar pruebas de carga
+        working-directory: backend
+        run: npm run test:load

@@ -154,6 +154,33 @@ Los objetivos iniciales son menos de 1 % de errores HTTP, p95 inferior a 500 ms
 y 100 % de checks aprobados. Son umbrales académicos iniciales y no constituyen
 una garantía de capacidad en producción.
 
+### Integración continua
+
+El workflow `.github/workflows/ci.yml` se ejecuta con cada `push`, cada
+`pull_request` y también puede iniciarse manualmente con `workflow_dispatch`.
+Utiliza Ubuntu 24.04 y Node.js 22.15.1, con cuatro jobs independientes:
+
+- **unitarias:** instala el backend y ejecuta `npm run test:unit`.
+- **integracion:** instala el backend y ejecuta `npm run test:integration`.
+- **e2e:** instala backend y frontend, compila React y ejecuta Cypress mediante
+  el orquestador aislado existente.
+- **carga:** instala backend y k6 2.2.0, y ejecuta los umbrales de carga mediante
+  el orquestador aislado existente.
+
+Todos los jobs instalan el backend con `npm ci --ignore-scripts` y verifican de
+forma explícita que `better-sqlite3` pueda abrir una base en memoria y ejecutar
+`SELECT 1`. El job E2E instala el frontend normalmente para permitir la
+instalación del binario de Cypress; si falla, conserva sus capturas durante tres
+días.
+
+Los resultados se consultan en la pestaña **Actions** del repositorio y en la
+sección de checks de cada pull request. Los nombres exactos que posteriormente
+deberán marcarse como requeridos son `unitarias`, `integracion`, `e2e` y
+`carga`.
+
+Este workflow no configura por sí solo la protección de `main`; esa regla debe
+activarse por separado en la configuración del repositorio.
+
 ### Pruebas previstas
 
 - Automatización: GitHub Actions.
